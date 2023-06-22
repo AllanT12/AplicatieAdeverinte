@@ -8,10 +8,14 @@ class Users(AbstractUser):
     STUDENT = 0
     SECRETARA = 1
     ADMIN = 2
+    SECRETARA_SEF = 3
+    DECAN = 4
     ROLES = (
         (STUDENT, "STUDENT"),
         (SECRETARA, "SECRETARA"),
         (ADMIN, "ADMIN"),
+        (SECRETARA_SEF, "SECRETARA_SEF"),
+        (DECAN, "DECAN")
     )
     email = models.EmailField(unique=True)
     user_name = models.CharField(max_length=150, unique=True)

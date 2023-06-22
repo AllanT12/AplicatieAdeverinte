@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from injector import inject
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,6 +14,7 @@ from users.services import UserService
 # Create your views here.
 class UserAPIView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = (TokenAuthentication,)
 
     @inject
     def setup(self, request, my_service: UserService, **kwargs):
@@ -44,3 +46,13 @@ class UserAPIView(APIView):
         self.service.delete(token.user_id)
         return Response(status=status.HTTP_202_ACCEPTED)
 
+    def get(self, request):
+        token = request.auth
+        user = self.service.get(token.user_id)
+        data = UserSerializer(user, many=False)
+        return JsonResponse(status=200, data=data.data, safe=False)
+
+    def put(self, request):
+        user = self.service.get_all()
+        data = UserSerializer(user, many=True)
+        return JsonResponse(status=202, data=data.data, safe=False)

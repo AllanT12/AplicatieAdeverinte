@@ -1,7 +1,8 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.shortcuts import render
 from injector import inject
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,6 +14,7 @@ from adeverinte.services import AdeverintaService
 # Create your views here.
 class AdeverintaAPIView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = (TokenAuthentication,)
 
     @inject
     def setup(self, request, my_service: AdeverintaService, **kwargs):
@@ -21,7 +23,9 @@ class AdeverintaAPIView(APIView):
         self.kwargs = kwargs
 
     def post(self, request):
+        token = request.auth
         user = AdeverinteSerializer(data=request.data)
+        user.data["subsemnatul"] = token.user_id
         if user.is_valid():
             user.save()
             return Response(status=status.HTTP_201_CREATED)
@@ -41,3 +45,12 @@ class AdeverintaAPIView(APIView):
         device = self.service.get(nr=pk)
         device.delete()
         return Response(status=status.HTTP_202_ACCEPTED)
+
+    def put(self, request, pk):
+        buffer = self.service.createPDF(pk)
+        return FileResponse(buffer, as_attachment=True, filename="hello.pdf")
+
+    def get(self, request):
+        adeverinte = self.service.get_all()
+        data = AdeverinteSerializer(adeverinte, many=True)
+        return JsonResponse(status=200, data=data.data, safe=False)

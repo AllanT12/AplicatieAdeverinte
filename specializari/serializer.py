@@ -6,4 +6,4 @@ from specializari.models import Specializari
 class SpecializariSerializer(serializers.ModelSerializer):
     class Meta:
         model = Specializari
-        fields = '__all__'
+        fields = ['id', 'nume', 'acronim', 'is_master']

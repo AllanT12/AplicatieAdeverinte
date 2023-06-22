@@ -41,3 +41,8 @@ class SpecializariAPIView(APIView):
         device = self.service.get(nr=pk)
         device.delete()
         return Response(status=status.HTTP_202_ACCEPTED)
+
+    def get(self, request):
+        specializari = self.service.get_all()
+        data = SpecializariSerializer(specializari, many=True)
+        return JsonResponse(status=200, data=data.data, safe=False)
