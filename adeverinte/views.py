@@ -24,8 +24,8 @@ class AdeverintaAPIView(APIView):
 
     def post(self, request):
         token = request.auth
+        request.data.update(self.service.create(request.data, token.user_id))
         user = AdeverinteSerializer(data=request.data)
-        user.data["subsemnatul"] = token.user_id
         if user.is_valid():
             user.save()
             return Response(status=status.HTTP_201_CREATED)
@@ -47,7 +47,8 @@ class AdeverintaAPIView(APIView):
         return Response(status=status.HTTP_202_ACCEPTED)
 
     def put(self, request, pk):
-        buffer = self.service.createPDF(pk)
+        token = request.auth
+        buffer = self.service.createPDF(pk, token.user_id)
         return FileResponse(buffer, as_attachment=True, filename="hello.pdf")
 
     def get(self, request):
