@@ -11,8 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-#os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'AplicatieAdeverinte.settings')
-settings_module = 'AplicatieAdeverinte.production' if 'PRODUCTION' in os.environ else 'AplicatieAdeverinte.settings'
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'AplicatieAdeverinte.settings')
 
 application = get_asgi_application()
