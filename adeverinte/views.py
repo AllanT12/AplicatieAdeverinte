@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from adeverinte.serializer import AdeverinteSerializer
+from adeverinte.serializer import AdeverinteSerializer, AdeverinteSerializerOut
 from adeverinte.services import AdeverintaService
 
 
@@ -51,7 +51,15 @@ class AdeverintaAPIView(APIView):
         buffer = self.service.createPDF(pk, token.user_id)
         return FileResponse(buffer, as_attachment=True, filename="hello.pdf")
 
+    def patch(self, request, pk):
+        token = request.auth
+        if request.data["accept"]:
+            self.service.Accept(pk, token.user_id)
+        else:
+            self.service.Deny(pk, token.user_id)
+        return Response(status=status.HTTP_202_ACCEPTED)
+
     def get(self, request):
         adeverinte = self.service.get_all()
-        data = AdeverinteSerializer(adeverinte, many=True)
+        data = AdeverinteSerializerOut(adeverinte, many=True)
         return JsonResponse(status=200, data=data.data, safe=False)

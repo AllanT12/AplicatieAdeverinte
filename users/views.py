@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from users.serializer import UserSerializer
+from users.serializer import UserSerializer, UserSerializerOut
 from users.services import UserService
 
 
@@ -54,5 +54,5 @@ class UserAPIView(APIView):
 
     def put(self, request):
         user = self.service.get_all()
-        data = UserSerializer(user, many=True)
+        data = UserSerializerOut(user, many=True)
         return JsonResponse(status=202, data=data.data, safe=False)

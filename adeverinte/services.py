@@ -32,6 +32,9 @@ class AdeverintaService:
     def createPDF(self, nr, user_id):
         adeverinta = self.get(nr)
         subsemnat = Users.objects.get(email=adeverinta.subsemnatul)
+        decan = Users.objects.get(email=adeverinta.decan)
+        secS = Users.objects.get(email=adeverinta.secretar_sef)
+        sec = Users.objects.get(email=adeverinta.secretar)
         buffer = io.BytesIO()
         p = canvas.Canvas(buffer)
         pdfmetrics.registerFont(TTFont("TNR", "times.ttf"))
@@ -44,8 +47,13 @@ class AdeverintaService:
         form = p.acroForm
         spec = Specializari.objects.all()
         y= 610
+        id_list = [item['id'] for item in subsemnat.specializare.values("id")]
         for i in spec :
-            form.checkbox(x=40, y=y, checked=False, buttonStyle='check',
+            c = False
+            for j in id_list:
+                if i.id == j:
+                    c = True
+            form.checkbox(x=40, y=y, checked=c, buttonStyle='check',
                       name="program",
                       tooltip="program",
                       relative=True,
@@ -60,10 +68,15 @@ class AdeverintaService:
         p.drawString(70, y, "DECAN,")
         p.drawCentredString(300, y, "SECRETAR SEF,")
         p.drawString(450, y, "SECRETARIAT,")
-        p.drawString(430, 750, "Nr..../FIESC/....")
+        y -= 15
+        p.drawString(70, y, decan.first_name + " " + decan.last_name)
+        p.drawString(300, y, secS.first_name + " " + secS.last_name)
+        p.drawString(450, y, sec.first_name + " " + sec.last_name)
+
+        p.drawString(430, 750, f"Nr {adeverinta.nr}/FIESC/{adeverinta.data}")
         p.setFont("TNR", 12)
         p.drawString(30, 790, "UNIVERSITATEA STEFAN CEL MARE DIN SUCEAVA")
-        p.drawString(30, 775, "FACULTATEA DE INGINERIE ELECTRICA SI ȘTIINȚA CALCULATOARELOR")
+        p.drawString(30, 775, "FACULTATEA DE INGINERIE ELECTRICA SI STIINTA CALCULATOARELOR")
         p.showPage()
         p.save()
         buffer.seek(0)
@@ -88,3 +101,21 @@ class AdeverintaService:
         data["numar_de_inregistrare_comun"] = self.nr
         data["data"] = datetime.date.today()
         return data
+
+    def Accept(self, id,user_id):
+        subsemnat = Users.objects.get(pk=user_id)
+        adev = Adeverinta.objects.get(pk=id)
+        if subsemnat.role == 1:
+            adev.acord_secretar = True
+        elif subsemnat.role == 3:
+            adev.acord_secretar_sef = True
+        elif subsemnat.role == 4:
+            adev.acord_decan = True
+        if adev.acord_decan and adev.acord_secretar and adev.acord_secretar_sef:
+            adev.stare = 1
+        adev.save()
+
+    def Deny(self, id,user_id):
+        adev = Adeverinta.objects.get(pk=id)
+        adev.stare = 2
+        adev.save()
