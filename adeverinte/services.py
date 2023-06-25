@@ -119,3 +119,7 @@ class AdeverintaService:
         adev = Adeverinta.objects.get(pk=id)
         adev.stare = 2
         adev.save()
+
+    def getOnlyAccepted(self):
+        adev = Adeverinta.objects.filter(stare=1)
+        return adev

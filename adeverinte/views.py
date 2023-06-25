@@ -1,4 +1,6 @@
-from django.http import JsonResponse, FileResponse
+import csv
+
+from django.http import JsonResponse, FileResponse, HttpResponse
 from django.shortcuts import render
 from injector import inject
 from rest_framework import status
@@ -59,7 +61,16 @@ class AdeverintaAPIView(APIView):
             self.service.Deny(pk, token.user_id)
         return Response(status=status.HTTP_202_ACCEPTED)
 
-    def get(self, request):
+    def get(self, request, pk):
+        if pk == 1:
+            adeverinte = self.service.getOnlyAccepted()
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="export.csv"'
+            writer = csv.DictWriter(response, fieldnames=['Nume', 'Motiv', 'Nr', 'Data'])
+            writer.writeheader()
+            for i in adeverinte:
+                writer.writerow({'Nume': i.subsemnatul.first_name, 'Motiv': i.motivatie,'Nr': i.nr, 'Data': i.data})
+            return response
         adeverinte = self.service.get_all()
         data = AdeverinteSerializerOut(adeverinte, many=True)
         return JsonResponse(status=200, data=data.data, safe=False)
