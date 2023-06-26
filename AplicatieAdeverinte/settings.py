@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'users',
     'adeverinte',
-    'specializari'
+    'specializari',
+    'setari'
 ]
 
 MIDDLEWARE = [
@@ -86,24 +87,25 @@ WSGI_APPLICATION = 'AplicatieAdeverinte.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+'''
+DATABASES = {
+    'default': {
 
-#DATABASES = {
-#    'default': {
+       'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
- #       'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'AplicatieAdeverinte',
 
-  #      'NAME': 'AplicatieAdeverinte',
+       'USER': 'postgres',
 
-   #     'USER': 'postgres',
+        'PASSWORD': 'popasdf12',
 
-    #    'PASSWORD': 'popasdf12',
+        'HOST': 'localhost',
 
-     #   'HOST': 'localhost',
+        'PORT': '5433',
 
-      #  'PORT': '5433',
-
-  #  }
-#}
+    }
+}
+'''
 
 hostname = os.environ['DBHOST']
 DATABASES = {

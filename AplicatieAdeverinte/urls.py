@@ -22,4 +22,5 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('adeverinte/', include('adeverinte.urls')),
     path('specializari/', include('specializari.urls')),
+    path('setari/', include('setari.urls')),
 ]
